@@ -1,6 +1,51 @@
 
 const KEY='course_hub_platform_v3';
+const GITHUB_CONFIG_KEY='course_hub_github_sync_v1';
+const GITHUB_RAW_URL='https://raw.githubusercontent.com/itzsabik57/Course-Hub/main/course-hub-data.json';
+const GITHUB_API_BASE='https://api.github.com/repos/itzsabik57/Course-Hub/contents/course-hub-data.json';
+let githubReady=false, githubSyncTimer=null, githubSyncBusy=false, githubSyncQueued=false;
 let data=readStore();
+function githubConfig(){try{return JSON.parse(localStorage.getItem(GITHUB_CONFIG_KEY)||'{}')}catch(e){return {}}}
+function setGithubConfig(c){localStorage.setItem(GITHUB_CONFIG_KEY,JSON.stringify(c))}
+function utf8ToBase64(str){const bytes=new TextEncoder().encode(str);let bin='';for(let i=0;i<bytes.length;i+=0x8000)bin+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(bin)}
+function base64ToUtf8(b64){const bin=atob((b64||'').replace(/\s/g,''));const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes)}
+function githubPayload(){return {app:'Course Hub',version:7,exportedAt:new Date().toISOString(),data,accessState:{codes:accessState.codes||[]}}}
+function queueGithubSync(){if(!githubReady)return;clearTimeout(githubSyncTimer);githubSyncTimer=setTimeout(()=>syncToGithub(),900)}
+async function loadGithubData(){
+  try{
+    const r=await fetch(GITHUB_RAW_URL+'?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw new Error('GitHub JSON HTTP '+r.status);
+    const x=await r.json(), d=x.data||x;
+    if(!Array.isArray(d.platforms))throw new Error('Invalid Course Hub JSON');
+    normalize(d);data=d;
+    if(x.accessState&&Array.isArray(x.accessState.codes)){
+      const active=Array.isArray(accessState.activeCodes)?accessState.activeCodes:[];
+      accessState={codes:x.accessState.codes,activeCodes:active.filter(id=>x.accessState.codes.some(c=>c.id===id))};
+    }
+    localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem('course_hub_access_v1',JSON.stringify(accessState));
+    return true;
+  }catch(e){console.warn('GitHub data load failed:',e);return false}
+}
+async function syncToGithub(){
+  const c=githubConfig();
+  if(!c.token||!c.owner||!c.repo||!c.path)return;
+  if(githubSyncBusy){githubSyncQueued=true;return}
+  githubSyncBusy=true;githubSyncQueued=false;
+  try{
+    const api=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${c.path.split('/').map(encodeURIComponent).join('/')}`;
+    const headers={'Accept':'application/vnd.github+json','Content-Type':'application/json','Authorization':'Bearer '+c.token,'X-GitHub-Api-Version':'2022-11-28'};
+    const get=await fetch(api+'?ref='+encodeURIComponent(c.branch||'main'),{headers});
+    let sha;
+    if(get.ok){const info=await get.json();sha=info.sha}
+    const body={message:'Update Course Hub data',content:utf8ToBase64(JSON.stringify(githubPayload(),null,2)),branch:c.branch||'main'};
+    if(sha)body.sha=sha;
+    const put=await fetch(api,{method:'PUT',headers,body:JSON.stringify(body)});
+    if(!put.ok){const msg=await put.text();throw new Error(msg.slice(0,180))}
+    toast('GitHub JSON updated');
+  }catch(e){console.error('GitHub sync failed:',e);toast('GitHub sync failed')}
+  finally{githubSyncBusy=false;if(githubSyncQueued)queueGithubSync()}
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));queueGithubSync();return true}catch(e){console.error(e);return false}}
 let route={repo:null,node:null};
 let busy=false;
 let adminLoggedIn=localStorage.getItem('course_hub_admin')==='1';
@@ -28,7 +73,7 @@ function migrateRepositories(x){
 function uid(){return 'n_'+Date.now().toString(36)+Math.random().toString(36).slice(2,9)}
 function node(type,name=''){return {id:uid(),type,name,image:'',youtube:'',children:[]}}
 function migrateLegacy(x){const r={id:uid(),name:'Imported Courses',image:'',children:[]};(x.platforms||[]).forEach(p=>{const pn=node('platform',p.name);pn.image=p.image||'';r.children.push(pn);(p.courses||[]).forEach(c=>{const cn=node('course',c.name);cn.image=c.image||'';pn.children.push(cn);(c.subjects||[]).forEach(s=>{const sn=node('subject',s.name);sn.image=s.image||'';cn.children.push(sn);(s.chapters||[]).forEach(ch=>{const hn=node('chapter',ch.name);sn.children.push(hn);(ch.parts||[]).forEach(pt=>{const pn2=node('chapter-part',pt.name);hn.children.push(pn2);(pt.lectures||[]).forEach(l=>{const ln=node('lecture',l.name);ln.youtube=l.youtube||'';pn2.children.push(ln)})});(ch.lectures||[]).forEach(l=>{const ln=node('lecture',l.name);ln.youtube=l.youtube||'';hn.children.push(ln)})})})})});return {platforms:r.children||[]}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(data));scheduleGithubSync();return true}catch(e){console.error(e);return false}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){console.error(e);return false}}
 function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.remove('show'),1900)}
 function typeLabel(t){return ({platform:'Platform',course:'Course',subject:'Subject / Cycle',chapter:'Chapter','chapter-part':'Chapter Part',lecture:'Lecture'}[t]||t)}
@@ -50,9 +95,9 @@ function listHTML(list){return '<div class="list">'+list.map(n=>`<button class="
 function openModal(title,html){document.getElementById('modalTitle').textContent=title;document.getElementById('modalContent').innerHTML=html;document.getElementById('modal').classList.add('show');setTimeout(()=>document.querySelector('#modalContent input,#modalContent select')?.focus(),60)}
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 function readAccessState(){try{const x=JSON.parse(localStorage.getItem('course_hub_access_v1')||'null');if(!x||!Array.isArray(x.codes))return {codes:[],activeCodes:[]};if(!Array.isArray(x.activeCodes))x.activeCodes=[];x.codes=x.codes.filter(c=>c.platformId||Array.isArray(c.nodeIds));return x}catch(e){return {codes:[],activeCodes:[]}}}
-function saveAccessState(){try{localStorage.setItem('course_hub_access_v1',JSON.stringify(accessState));return true}catch(e){return false}}
+function saveAccessState(){try{localStorage.setItem('course_hub_access_v1',JSON.stringify(accessState));queueGithubSync();return true}catch(e){return false}}
 function isAdmin(){return adminLoggedIn}
-function accessLogin(){const active=activeAccessCodes().length;openModal('Access',`<div class="field"><label>Enter Access Code</label><input id="accessCodeInput" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters"></div><div class="actions"><button class="btn secondary" onclick="adminLogin()">Admin Login</button><button class="btn primary" onclick="redeemAccess(this)">Unlock</button></div>${active?'<button class="btn danger" style="width:100%;margin-top:9px" onclick="removeAccess()">Remove Access</button>':''}`)}
+function accessLogin(){const active=activeAccessCodes().length;openModal('Access',`<div class="field"><label>Enter Access Code</label><input id="accessCodeInput" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters"></div><div class="actions"><button class="btn secondary" onclick="adminLogin()">Admin Login</button><button class="btn primary" onclick="redeemAccess(this)">Unlock</button></div>${active?'<button class="btn danger" style="width:100%;margin-top:9px" onclick="removeAccess()">Remove Access</button>':''}<div class="hint">Enter an access code provided by the administrator.</div>`)}
 function adminLogin(){openModal('Admin Login',`<div class="field"><label>Username</label><input id="adminUser" value="" autocomplete="username"></div><div class="field"><label>Password</label><input id="adminPass" type="password" autocomplete="current-password"></div><div class="actions"><button class="btn secondary" onclick="accessLogin()">Cancel</button><button class="btn primary" onclick="doAdminLogin()">Login</button></div>`)}
 function doAdminLogin(){const u=document.getElementById('adminUser')?.value||'',p=document.getElementById('adminPass')?.value||'';if(u==='admin'&&p==='admin'){adminLoggedIn=true;localStorage.setItem('course_hub_admin','1');adminPanel();toast('Admin login successful')}else toast('Invalid admin login')}
 function adminLogout(){adminLoggedIn=false;localStorage.removeItem('course_hub_admin');closeModal();toast('Admin logged out')}
@@ -63,8 +108,19 @@ function adminPanel(){openModal('Admin Panel',`<div class="list"><div class="adm
 <button class="item-card" onclick="document.getElementById('importFile').click()"><span class="item-icon">↑</span><span class="item-copy"><span class="item-name">Import Course Data</span></span><span class="chev">›</span></button>
 <input id="importFile" type="file" accept=".json,application/json" hidden onchange="importData(this.files[0])">
 <button class="item-card" onclick="manageAccess()"><span class="item-icon">⌁</span><span class="item-copy"><span class="item-name">Access Codes</span></span><span class="chev">›</span></button>
-<button class="item-card" onclick="githubSettings()"><span class="item-icon">⌘</span><span class="item-copy"><span class="item-name">GitHub JSON Sync</span></span><span class="chev">›</span></button>
+<button class="item-card" onclick="githubSettings()"><span class="item-icon">↻</span><span class="item-copy"><span class="item-name">GitHub JSON Sync</span></span><span class="chev">›</span></button>
 <button class="btn danger" style="width:100%;margin-top:5px" onclick="resetAll()">Reset All Data</button><button class="btn secondary" style="width:100%" onclick="adminLogout()">Log Out</button></div>`)}
+function githubSettings(){
+  if(!isAdmin())return accessLogin();
+  const c=githubConfig();
+  openModal('GitHub JSON Sync',`<div class="field"><label>GitHub Owner</label><input id="ghOwner" value="${esc(c.owner||'itzsabik57')}" autocomplete="off"></div><div class="field"><label>Repository</label><input id="ghRepo" value="${esc(c.repo||'Course-Hub')}" autocomplete="off"></div><div class="field"><label>Branch</label><input id="ghBranch" value="${esc(c.branch||'main')}" autocomplete="off"></div><div class="field"><label>JSON File Path</label><input id="ghPath" value="${esc(c.path||'course-hub-data.json')}" autocomplete="off"></div><div class="field"><label>GitHub Fine-grained Token</label><input id="ghToken" type="password" value="${esc(c.token||'')}" autocomplete="off" placeholder="Paste token here"></div><div class="actions"><button class="btn secondary" onclick="adminPanel()">Cancel</button><button class="btn primary" onclick="saveGithubSettings()">Save & Sync</button></div>`)
+}
+async function saveGithubSettings(){
+  const c={owner:document.getElementById('ghOwner')?.value.trim(),repo:document.getElementById('ghRepo')?.value.trim(),branch:document.getElementById('ghBranch')?.value.trim()||'main',path:document.getElementById('ghPath')?.value.trim()||'course-hub-data.json',token:document.getElementById('ghToken')?.value.trim()};
+  if(!c.owner||!c.repo||!c.path)return toast('Fill in the GitHub settings');
+  setGithubConfig(c);closeModal();toast('GitHub settings saved');githubReady=true;queueGithubSync();
+}
+
 function manageAccess(){
   if(!isAdmin())return accessLogin();
   openModal('Access Codes',`<button class="btn primary" style="width:100%" onclick="newAccess()">＋ Create New Access</button><div class="divider"></div>${accessState.codes.length?accessState.codes.map(c=>{const r=data.platforms.find(x=>x.id===c.platformId);const course=r?.children?.find(x=>x.id===c.courseId);const subject=course?.children?.find(x=>x.id===c.subjectId);const target=subject?esc(r?.name||'Platform')+' · '+esc(course?.name||'Course')+' · '+esc(subject.name):course?esc(r?.name||'Platform')+' · '+esc(course.name):esc(r?.name||'Platform')+' · Entire Platform';return `<div class="editor"><div class="editor-head"><div class="editor-name">${esc(c.code)}<div class="code-meta">${c.mode==='one-time'?'One-time':'Long-term'} · ${c.used?'Used':'Active'} · ${target}</div></div><div class="editor-actions"><button class="del" onclick="deleteAccess('${c.id}')">Delete</button></div></div></div>`}).join(''):'<div class="empty">No access codes yet.</div>'}`)
@@ -121,27 +177,15 @@ function compressImage(file){return new Promise((resolve,reject)=>{if(file.size>
 function delNode(rid,id){const r=data.platforms.find(x=>x.id===rid),p=parentOf(r,id);if(!p)return;if(confirm('Delete this item and everything inside it?')){p.children=p.children.filter(x=>x.id!==id);if(save()){manageRepo(rid);render()}}}
 function arrange(rid,id){const r=data.platforms.find(x=>x.id===rid),p=id===r?.id?r:(id?parentOf(r,id):r),list=p?.children||[];openModal(id===r?.id?'Arrange Platform':'Arrange Item',`${list.map(n=>`<div class="editor"><div class="editor-head"><div class="editor-name">${esc(n.name)}</div><div class="editor-actions"><button onclick="shift('${rid}','${p.id}','${n.id}',-1)">↑</button><button onclick="shift('${rid}','${p.id}','${n.id}',1)">↓</button></div></div></div>`).join('')}`)}
 function shift(rid,pid,id,d){const r=data.platforms.find(x=>x.id===rid),p=find(r,pid)||r,a=p.children||[],i=a.findIndex(x=>x.id===id),j=i+d;if(i<0||j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save();arrange(rid,pid===r.id?null:pid);render()}
-const GITHUB_KEY='course_hub_github_v1';
-let githubConfig=readGithubConfig();
-let githubSyncTimer=null;
-let githubSyncBusy=false;
-let githubSyncQueued=false;
-function readGithubConfig(){try{const x=JSON.parse(localStorage.getItem(GITHUB_KEY)||'null');return x&&typeof x==='object'?x:{owner:'',repo:'',branch:'main',path:'course-hub-data.json',token:''}}catch(e){return {owner:'',repo:'',branch:'main',path:'course-hub-data.json',token:''}}}
-function saveGithubConfig(){try{localStorage.setItem(GITHUB_KEY,JSON.stringify(githubConfig));return true}catch(e){return false}}
-function githubReady(){return !!(githubConfig.owner&&githubConfig.repo&&githubConfig.branch&&githubConfig.path)}
-function githubApiUrl(){return 'https://api.github.com/repos/'+encodeURIComponent(githubConfig.owner)+'/'+encodeURIComponent(githubConfig.repo)+'/contents/'+githubConfig.path.split('/').map(encodeURIComponent).join('/')}
-function githubHeaders(json=false){const h={'Accept':'application/vnd.github+json'};if(githubConfig.token)h.Authorization='Bearer '+githubConfig.token;if(json)h['Content-Type']='application/json';return h}
-function b64encode(s){return btoa(unescape(encodeURIComponent(s)))}
-function b64decode(s){return decodeURIComponent(escape(atob(s.replace(/\n/g,''))))}
-function githubPayload(){return JSON.stringify({app:'Course Hub',version:8,exportedAt:new Date().toISOString(),data,accessState},null,2)}
-async function githubGetFile(){if(!githubReady())return null;const u=githubApiUrl()+'?ref='+encodeURIComponent(githubConfig.branch);const res=await fetch(u,{headers:githubHeaders()});if(res.status===404)return null;if(!res.ok)throw new Error('GitHub read failed ('+res.status+')');return await res.json()}
-async function syncFromGitHub(){if(!githubReady())return;try{const remote=await githubGetFile();if(!remote)return;const parsed=JSON.parse(b64decode(remote.content||''));const d=parsed.data||parsed;if(!Array.isArray(d.platforms))throw new Error('Invalid JSON data');normalize(d);data=d;if(parsed.accessState&&Array.isArray(parsed.accessState.codes))accessState=parsed.accessState;else accessState={codes:[],activeCodes:[]};if(!Array.isArray(accessState.activeCodes))accessState.activeCodes=[];localStorage.setItem(KEY,JSON.stringify(data));saveAccessState();render()}catch(e){console.warn(e);toast('Could not load GitHub JSON')}}
-async function pushToGitHub(){if(!githubReady()||!githubConfig.token)return false;if(githubSyncBusy){githubSyncQueued=true;return false}githubSyncBusy=true;try{const existing=await githubGetFile();const body={message:'Update Course Hub data',content:b64encode(githubPayload()),branch:githubConfig.branch};if(existing?.sha)body.sha=existing.sha;const res=await fetch(githubApiUrl(),{method:'PUT',headers:githubHeaders(true),body:JSON.stringify(body)});if(!res.ok){const msg=await res.text();throw new Error('GitHub write failed ('+res.status+'): '+msg)}toast('GitHub JSON updated');return true}catch(e){console.warn(e);toast('GitHub sync failed')}finally{githubSyncBusy=false;if(githubSyncQueued){githubSyncQueued=false;setTimeout(()=>pushToGitHub(),250)}}return false}
-function scheduleGithubSync(){if(!githubReady()||!githubConfig.token)return;clearTimeout(githubSyncTimer);githubSyncTimer=setTimeout(()=>pushToGitHub(),900)}
-function githubSettings(){if(!isAdmin())return accessLogin();const c=githubConfig;openModal('GitHub JSON Sync',`<div class="field"><label>GitHub Username / Owner</label><input id="ghOwner" value="${esc(c.owner)}" placeholder="your-username" autocomplete="off"></div><div class="field"><label>Repository</label><input id="ghRepo" value="${esc(c.repo)}" placeholder="course-hub" autocomplete="off"></div><div class="field"><label>Branch</label><input id="ghBranch" value="${esc(c.branch||'main')}" placeholder="main" autocomplete="off"></div><div class="field"><label>JSON File Path</label><input id="ghPath" value="${esc(c.path||'course-hub-data.json')}" placeholder="course-hub-data.json" autocomplete="off"></div><div class="field"><label>GitHub Token</label><input id="ghToken" type="password" value="${esc(c.token||'')}" placeholder="GitHub fine-grained token" autocomplete="off"></div><div class="actions"><button class="btn secondary" onclick="adminPanel()">Cancel</button><button class="btn primary" onclick="saveGithubSettings(this)">Save & Sync</button></div>`)}
-async function saveGithubSettings(btn){const owner=document.getElementById('ghOwner')?.value.trim(),repo=document.getElementById('ghRepo')?.value.trim(),branch=document.getElementById('ghBranch')?.value.trim()||'main',path=document.getElementById('ghPath')?.value.trim()||'course-hub-data.json',token=document.getElementById('ghToken')?.value.trim();if(!owner||!repo||!path)return toast('Enter GitHub owner, repository and JSON path');githubConfig={owner,repo,branch,path,token};if(!saveGithubConfig())return toast('Could not save GitHub settings');btn.disabled=true;btn.textContent='Syncing…';try{const remote=await githubGetFile();if(remote){await pushToGitHub()}else if(token){await pushToGitHub()}else{toast('Saved. Add a token to enable automatic updates')}closeModal()}catch(e){console.warn(e);toast('GitHub connection failed')}finally{btn.disabled=false;btn.textContent='Save & Sync'}}
-function exportData(){if(!isAdmin())return accessLogin();const json=githubPayload();const blob=new Blob([json],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='course-hub-data.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);if(githubReady()&&githubConfig.token)pushToGitHub();else toast('JSON exported')}
+function exportData(){if(!isAdmin())return accessLogin();const blob=new Blob([JSON.stringify({app:'Course Hub',version:7,exportedAt:new Date().toISOString(),data,accessState},null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='course-hub-data.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);toast('JSON exported')}
 function importData(file){if(!isAdmin())return accessLogin();if(!file)return;const fr=new FileReader();fr.onload=()=>{try{const x=JSON.parse(fr.result),d=x.data||x;if(Array.isArray(d.repositories))d=migrateRepositories(d);if(!Array.isArray(d.platforms))throw 0;normalize(d);data=d;if(x.accessState&&Array.isArray(x.accessState.codes))accessState=x.accessState;else accessState={codes:[]};if(!save()||!saveAccessState())throw 0;closeModal();goHome();toast('JSON imported')}catch(e){toast('Invalid Course Hub JSON')}};fr.readAsText(file)}
 function normalize(d){(d.platforms||[]).forEach(r=>{r.id=r.id||uid();r.type='platform';r.children=Array.isArray(r.children)?r.children:[];walk(r.children)});function walk(a){a.forEach(n=>{n.id=n.id||uid();n.children=Array.isArray(n.children)?n.children:[];n.image=n.image||'';n.youtube=n.youtube||'';walk(n.children)})}}
 function resetAll(){if(!isAdmin())return accessLogin();if(!confirm('Delete ALL course data?'))return;data={platforms:[]};accessState={codes:[]};save();saveAccessState();goHome();toast('All data reset')}
-normalize(data);try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}render();syncFromGitHub();
+async function boot(){
+  normalize(data);
+  const loaded=await loadGithubData();
+  githubReady=true;
+  if(!loaded)save();
+  render();
+}
+boot();
