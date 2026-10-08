@@ -1,7 +1,7 @@
 {
   "app": "Course Hub",
   "version": 9,
-  "exportedAt": "2026-10-08T15:11:18.932Z",
+  "exportedAt": "2026-10-08T15:40:04.320Z",
   "accounts": [
     {
       "id": "Sabik",
@@ -98,6 +98,216 @@
                         "name": "Lecture 7",
                         "image": "",
                         "youtube": "https://youtu.be/x9y7Q0VwUFI?si=ps07WusvI0A_PCmq",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "n_muzorfgmy8r1gco",
+                    "type": "chapter",
+                    "name": "২ - ভেক্টর",
+                    "image": "",
+                    "youtube": "",
+                    "children": [
+                      {
+                        "id": "n_muzosaefcipw61p",
+                        "type": "lecture",
+                        "name": "Lecture 1",
+                        "image": "",
+                        "youtube": "https://youtu.be/L1lkIH_EzYk",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzosj6qxa93il6",
+                        "type": "lecture",
+                        "name": "Lecture 2",
+                        "image": "",
+                        "youtube": "https://youtu.be/e1QqonyOGNk",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzoste9w5f882x",
+                        "type": "lecture",
+                        "name": "Lecture 3",
+                        "image": "",
+                        "youtube": "https://youtu.be/aH5Qqg8uLBg",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzot41xzt0odx1",
+                        "type": "lecture",
+                        "name": "Lecture 4",
+                        "image": "",
+                        "youtube": "https://youtu.be/3mA0N7FgEow?si=_Z2ctEt4YmMUHnu2",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzotcub6u8ejtx",
+                        "type": "lecture",
+                        "name": "Lecture 5",
+                        "image": "",
+                        "youtube": "https://youtu.be/kvkvJNyjRSE?si=yvTFqb0dlZlknQyB",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzotpwqvea07yx",
+                        "type": "lecture",
+                        "name": "Lecture 6",
+                        "image": "",
+                        "youtube": "https://youtu.be/HUW1LtBUiiI?si=915OXD7a-E2X5Ybo",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzou1f1sswxrba",
+                        "type": "lecture",
+                        "name": "Lecture 7",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=fP41TfNIoJ8?si=ya1xDq-St5BPTUMs",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzouemw02ltwzw",
+                        "type": "lecture",
+                        "name": "Lecture 8",
+                        "image": "",
+                        "youtube": "https://youtu.be/uLrWNdXedbI?si=Lp-bvkq5NBIWw9u4",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzouo26uon74wv",
+                        "type": "lecture",
+                        "name": "Lecture 9",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=midy2DmH4Po",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzoux67dm1otts",
+                        "type": "lecture",
+                        "name": "Lecture 10",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=2qpIMIu6daA",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzp61tabfitino",
+                        "type": "lecture",
+                        "name": "Lecture 11",
+                        "image": "",
+                        "youtube": "https://youtu.be/DuDIwVck3VU?si=Iyi4jhHfI6AQJbtu",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzp6cje8x0jhx0",
+                        "type": "lecture",
+                        "name": "Lecture 12",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=IiNSWOcfHZ8",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzp6xgmi6ck9k7",
+                        "type": "lecture",
+                        "name": "Lecture 13",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=kskCNqa7jG0",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzp87hyvrrehng",
+                        "type": "lecture",
+                        "name": "Lecture 14",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=4n9-DFMZnEg",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzp8fu6qb1pjc0",
+                        "type": "lecture",
+                        "name": "Lecture 15",
+                        "image": "",
+                        "youtube": "https://youtu.be/ISadZfpItmE",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzp8vuuq9c9bop",
+                        "type": "lecture",
+                        "name": "Lecture 16",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=RvqcTcg7xCY",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzp97dcxzrn925",
+                        "type": "lecture",
+                        "name": "Lecture 17",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=jNtWvTcfZfY",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzp9jaaqtsxu1z",
+                        "type": "lecture",
+                        "name": "Lecture 18",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=3TZoeOjLBUI?si=HDXkIr3z9evO6qt1",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzp9supzcdzk6e",
+                        "type": "lecture",
+                        "name": "Lecture 19",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=08BvYWd06mo?si=9qZAYJi4WqPIullQ",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzpai6yq6h8qmc",
+                        "type": "lecture",
+                        "name": "Lecture 20",
+                        "image": "",
+                        "youtube": "https://youtu.be/oUza-F8X4O4",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzpaudo4g2ro8c",
+                        "type": "lecture",
+                        "name": "Lecture 21",
+                        "image": "",
+                        "youtube": "https://youtu.be/D3g8njLe2QI",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzpb5rgxs1kw86",
+                        "type": "lecture",
+                        "name": "Lecture 22",
+                        "image": "",
+                        "youtube": "https://www.youtube.com/watch?v=8LA5OPFdZZI",
+                        "children": []
+                      },
+                      {
+                        "id": "n_muzpctgtee0lh5k",
+                        "type": "lecture",
+                        "name": "Solve Class",
+                        "image": "",
+                        "youtube": "https://youtu.be/MUH8of9B7n0",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "n_muzpbs1rilruly7",
+                    "type": "chapter",
+                    "name": "৩ - গতিবিদ্যা",
+                    "image": "",
+                    "youtube": "",
+                    "children": [
+                      {
+                        "id": "n_muzpc4nvqk92fw8",
+                        "type": "lecture",
+                        "name": "Lecture 1",
+                        "image": "",
+                        "youtube": "https://youtu.be/k5jilbrA-Y0",
                         "children": []
                       }
                     ]
