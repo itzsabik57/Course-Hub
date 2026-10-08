@@ -1,7 +1,7 @@
 {
   "app": "Course Hub",
   "version": 9,
-  "exportedAt": "2026-10-08T14:23:27.410Z",
+  "exportedAt": "2026-10-08T14:29:30.791Z",
   "accounts": [
     {
       "id": "FT",
@@ -74,6 +74,14 @@
                     "id": "n_muzmlh4be4txcqm",
                     "type": "chapter",
                     "name": "1",
+                    "image": "",
+                    "youtube": "",
+                    "children": []
+                  },
+                  {
+                    "id": "n_muzmu8fhxb2f6hg",
+                    "type": "chapter",
+                    "name": "Gg",
                     "image": "",
                     "youtube": "",
                     "children": []
