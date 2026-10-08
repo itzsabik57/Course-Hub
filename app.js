@@ -47,7 +47,28 @@ function normalizeData(x){
 }
 function logout(){sessionStorage.removeItem('course_hub_logged_in');sessionStorage.removeItem('course_hub_account');location.reload()}
 function hasDirectAccess(id){return allowedIds.has('*')||allowedIds.has(String(id))}
-function subtreeHasAccess(n){if(!n)return false;if(hasDirectAccess(n.id))return true;return (n.children||[]).some(subtreeHasAccess)}
+function subtreeHasAccess(n){
+  if(!n)return false;
+  if(hasDirectAccess(n.id))return true;
+  return (n.children||[]).some(subtreeHasAccess);
+}
+function nodeIsInsideGrantedParent(n){
+  if(!n)return false;
+  for(const id of allowedIds){
+    if(id==='*')return true;
+    for(const p of data.platforms){
+      const granted=find(p,id);
+      if(granted&&find(granted,n.id))return true;
+    }
+  }
+  return false;
+}
+function hasAccess(n){return !!n && (hasDirectAccess(n.id)||nodeIsInsideGrantedParent(n));}
+function subtreeHasAccess(n){
+  if(!n)return false;
+  if(hasAccess(n))return true;
+  return (n.children||[]).some(subtreeHasAccess);
+}
 function visibleChildren(n){return (n?.children||[]).filter(subtreeHasAccess)}
 function parentAccessVisible(r,n){return subtreeHasAccess(n)}
 function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
