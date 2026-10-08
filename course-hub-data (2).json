@@ -1,0 +1,46 @@
+{
+  "app": "Course Hub",
+  "version": 8,
+  "exportedAt": "2026-10-08T13:45:50.830Z",
+  "accounts": [
+    {
+      "id": "Sbk",
+      "password": "admin",
+      "enabled": true
+    },
+    {
+      "id": "Kbk",
+      "password": "admin",
+      "enabled": true
+    }
+  ],
+  "data": {
+    "platforms": [
+      {
+        "id": "n_muz18k8yj5umpgj",
+        "type": "platform",
+        "name": "Feel",
+        "image": "",
+        "youtube": "",
+        "children": [
+          {
+            "id": "n_muz18oleyvs2t22",
+            "type": "subject",
+            "name": "I",
+            "image": "",
+            "youtube": "",
+            "children": []
+          },
+          {
+            "id": "n_muz18sg4plm5757",
+            "type": "chapter",
+            "name": "9 go",
+            "image": "",
+            "youtube": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+}

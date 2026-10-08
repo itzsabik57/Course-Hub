@@ -1,18 +1,1 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Course Hub</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="app">
-<header class="topbar"><button id="backBtn" class="top-btn" onclick="goBack()" aria-label="Back">‹</button><div class="brand" onclick="goHome()">Course Hub</div><span class="top-btn" aria-hidden="true" style="visibility:hidden">⚙</span></header>
-<main id="app"></main>
-</div>
-<div id="modal" class="modal"><section class="sheet"><div class="sheet-head"><h2 id="modalTitle">Settings</h2><button class="close" onclick="closeModal()">×</button></div><div id="modalContent"></div></section></div>
-<div id="toast" class="toast"></div>
-<script src="app.js"></script>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Course Hub</title><link rel="stylesheet" href="style.css"></head><body><div id="loginScreen" class="login"><div class="login-card"><h1 class="login-title">Course Hub</h1><div class="login-sub">Sign in to continue</div><div class="field"><label>User ID</label><input id="loginId" autocomplete="username"></div><div class="field"><label>Password</label><input id="loginPass" type="password" autocomplete="current-password"></div><button class="btn primary login-btn" onclick="login()">Log In</button><div id="loginError" class="login-error"></div></div></div><div id="site" class="public-hide"><div class="app"><header class="topbar"><button id="backBtn" class="top-btn" onclick="goBack()" aria-label="Back">‹</button><div class="brand" onclick="goHome()">Course Hub</div><button class="top-btn" onclick="logout()" aria-label="Log out">↪</button></header><main id="app"></main></div></div><div id="toast" class="toast"></div><script src="app.js"></script></body></html>
