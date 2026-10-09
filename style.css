@@ -80,3 +80,14 @@ body{background:radial-gradient(ellipse at top,rgba(48,65,88,.12),transparent 55
   .subject-item .item-name{font-size:12px;line-height:1.3;}
   .subject-item .chev{right:10px;font-size:24px;}
 }
+
+/* Thumbnail correction: round the uploaded image itself, preserve its full aspect ratio, and remove letterbox/background bars. */
+.course-item{align-items:center;}
+.course-thumb{display:block;width:42%;min-width:0;height:auto;min-height:0;max-height:138px;object-fit:contain;object-position:center;border-radius:14px;background:transparent;overflow:hidden;flex:0 0 42%;}
+.subject-item{align-items:center;}
+.subject-thumb{display:block;flex:0 0 42%;width:42%;max-width:42%;height:auto;min-height:0;max-height:124px;object-fit:contain;object-position:center;border-radius:14px;background:transparent;overflow:hidden;}
+.course-placeholder,.subject-placeholder{background:transparent;border-radius:14px;}
+@media(max-width:430px){
+  .course-thumb{width:42%;min-width:0;flex-basis:42%;height:auto;min-height:0;max-height:120px;border-radius:12px;}
+  .subject-thumb{width:42%;max-width:42%;flex-basis:42%;height:auto;min-height:0;max-height:110px;border-radius:12px;}
+}
