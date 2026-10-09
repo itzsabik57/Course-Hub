@@ -56,3 +56,12 @@ body{background:radial-gradient(ellipse at top,rgba(48,65,88,.12),transparent 55
 .hero-wide{box-shadow:0 12px 30px rgba(0,0,0,.18);border-color:rgba(255,255,255,.12)}
 .empty{background:rgba(255,255,255,.035);border:1px dashed rgba(255,255,255,.16);backdrop-filter:blur(14px)}
 @media(max-width:430px){.course-item{min-height:142px;padding:8px 40px 8px 8px;border-radius:19px}.course-thumb,.course-placeholder{min-height:124px;width:43%;min-width:43%;border-radius:13px}.course-copy{padding:10px 11px}.course-title{font-size:15px}.course-arrow{right:11px}.subject-thumb,.subject-placeholder{width:94px;height:82px}.subject-item{min-height:98px;padding-right:39px}}
+
+
+/* FIX: preserve the complete course thumbnail image; never crop to square */
+.course-item{min-height:142px;padding:9px 44px 9px 9px;gap:0}
+.course-thumb{width:44%;min-width:44%;height:auto;min-height:0;align-self:stretch;object-fit:contain;object-position:center;background:rgba(0,0,0,.16);border-radius:13px}
+.course-placeholder{width:44%;min-width:44%;min-height:0;align-self:stretch;border-radius:13px}
+.course-copy{padding:10px 12px}
+.course-title{font-size:14px;line-height:1.28}
+@media(max-width:430px){.course-item{min-height:128px;padding:8px 38px 8px 8px;border-radius:19px}.course-thumb,.course-placeholder{width:44%;min-width:44%;min-height:0;height:auto;object-fit:contain;border-radius:12px}.course-copy{padding:8px 10px}.course-title{font-size:13px;line-height:1.28}.course-arrow{right:10px;font-size:25px}}
