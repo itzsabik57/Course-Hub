@@ -43,23 +43,45 @@ async function loadData(){
 function normalizeData(x){
   if(Array.isArray(x?.platforms))return {platforms:x.platforms};
   if(Array.isArray(x?.repositories))return {platforms:x.repositories};
+  if(Array.isArray(x?.data?.platforms))return {platforms:x.data.platforms};
+  if(Array.isArray(x?.data?.repositories))return {platforms:x.data.repositories};
+  if(Array.isArray(x?.data))return {platforms:x.data};
   return {platforms:[]};
 }
 function logout(){sessionStorage.removeItem('course_hub_logged_in');sessionStorage.removeItem('course_hub_account');location.reload()}
 function hasDirectAccess(id){return allowedIds.has('*')||allowedIds.has(String(id))}
-function subtreeHasAccess(n){if(!n)return false;if(hasDirectAccess(n.id))return true;return (n.children||[]).some(subtreeHasAccess)}
-function hasAncestorAccess(root,id){let p=parentOf(root,id);while(p){if(hasDirectAccess(p.id))return true;p=parentOf(root,p.id)}return false}
-function accessGranted(root,n){if(!n)return false;if(hasDirectAccess(n.id))return true;let p=parentOf(root,n.id);while(p){if(hasDirectAccess(p.id))return true;p=parentOf(root,p.id)}return false}
-function visibleChildren(n){const r=repo();return (n?.children||[]).filter(x=>accessGranted(r,x)||subtreeHasAccess(x))}
+function subtreeHasAccess(n){
+  if(!n)return false;
+  if(hasDirectAccess(n.id))return true;
+  return (n.children||[]).some(subtreeHasAccess);
+}
+function nodeIsInsideGrantedParent(n){
+  if(!n)return false;
+  for(const id of allowedIds){
+    if(id==='*')return true;
+    for(const p of data.platforms){
+      const granted=find(p,id);
+      if(granted&&find(granted,n.id))return true;
+    }
+  }
+  return false;
+}
+function hasAccess(n){return !!n && (hasDirectAccess(n.id)||nodeIsInsideGrantedParent(n));}
+function subtreeHasAccess(n){
+  if(!n)return false;
+  if(hasAccess(n))return true;
+  return (n.children||[]).some(subtreeHasAccess);
+}
+function visibleChildren(n){return (n?.children||[]).filter(subtreeHasAccess)}
 function parentAccessVisible(r,n){return subtreeHasAccess(n)}
 function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function find(root,id){if(!root)return null;if(root.id===id)return root;for(const c of(root.children||[])){const x=find(c,id);if(x)return x}return null}
-function parentOf(root,id){if(!root)return null;if((root.children||[]).some(x=>x.id===id))return root;for(const c of(root.children||[])){const p=parentOf(c,id);if(p)return p}return null}
+function find(root,id){if(!root)return null;if(String(root.id)===String(id))return root;for(const c of(root.children||[])){const x=find(c,id);if(x)return x}return null}
+function parentOf(root,id){if(!root)return null;if((root.children||[]).some(x=>String(x.id)===String(id)))return root;for(const c of(root.children||[])){const p=parentOf(c,id);if(p)return p}return null}
 function repo(){return data.platforms.find(x=>String(x.id)===String(route.repo))}
 function goHome(){route={repo:null,node:null};render()}
 function goBack(){if(route.node){const r=repo();const p=parentOf(r,route.node);route.node=p&&p.id!==r.id?p.id:null;render()}else if(route.repo)goHome()}
 function openRepo(id){const r=data.platforms.find(x=>String(x.id)===String(id));if(!r)return toast('Platform not found');route={repo:r.id,node:null};render()}
-function openNode(id){const r=repo();const n=find(r,id);if(!n)return toast('Content not found');if(!accessGranted(r,n)&&!subtreeHasAccess(n))return toast('You do not have access to this content');if(n.type==='lecture'&&n.youtube){window.location.href=n.youtube;return}route.node=n.id;render()}
+function openNode(id){const r=repo();const n=find(r,id);if(!n)return toast('Content not found');if(!subtreeHasAccess(n))return toast('You do not have access to this content');if(n.type==='lecture'&&n.youtube){window.location.href=n.youtube;return}route.node=n.id;render()}
 
 function render(){
   const a=document.getElementById('app');
@@ -76,7 +98,7 @@ function render(){
 }
 
 function renderHome(a){
-  const platforms=data.platforms.filter(x=>accessGranted(x,x)||subtreeHasAccess(x));
+  const platforms=data.platforms.filter(subtreeHasAccess);
   a.innerHTML='<div class="page">'+(platforms.length?'<div class="grid">'+platforms.map(r=>`<button type="button" class="tile" data-action="open-repo" data-id="${esc(r.id)}">${r.image?`<img class="tile-img" src="${esc(r.image)}" alt="">`:'<div class="tile-img" style="display:grid;place-items:center;font-size:30px;color:#747985">▣</div>'}<div class="tile-shade"></div><div class="tile-body"><div class="tile-title">${esc(r.name)}</div></div></button>`).join('')+'</div>':'<div class="empty">No platforms yet.</div>')+'</div>';
 }
 function renderRepo(a,r){const kids=visibleChildren(r);a.innerHTML=`<div class="page">${kids.length?contentHTML(kids):'<div class="empty">No course access assigned here.</div>'}</div>`}
