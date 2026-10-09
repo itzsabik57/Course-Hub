@@ -65,3 +65,18 @@ body{background:radial-gradient(ellipse at top,rgba(48,65,88,.12),transparent 55
 .course-copy{padding:10px 12px}
 .course-title{font-size:14px;line-height:1.28}
 @media(max-width:430px){.course-item{min-height:128px;padding:8px 38px 8px 8px;border-radius:19px}.course-thumb,.course-placeholder{width:44%;min-width:44%;min-height:0;height:auto;object-fit:contain;border-radius:12px}.course-copy{padding:8px 10px}.course-title{font-size:13px;line-height:1.28}.course-arrow{right:10px;font-size:25px}}
+
+/* FIX: Subject / Cycle thumbnails show the full image with rounded corners */
+.subject-item{min-height:116px;padding:10px 44px 10px 10px;gap:0;border-radius:20px;}
+.subject-thumb{display:block;flex:0 0 42%;width:42%;max-width:42%;height:94px;min-height:94px;object-fit:contain;object-position:center center;border-radius:14px;background:rgba(0,0,0,.18);overflow:hidden;}
+.subject-placeholder{flex:0 0 42%;width:42%;max-width:42%;height:94px;min-height:94px;border-radius:14px;overflow:hidden;}
+.subject-item .item-copy{min-width:0;flex:1;padding:10px 12px;}
+.subject-item .item-name{font-size:13px;line-height:1.3;}
+.subject-item .chev{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:25px;}
+@media(max-width:430px){
+  .subject-item{min-height:108px;padding:8px 38px 8px 8px;border-radius:18px;}
+  .subject-thumb,.subject-placeholder{flex-basis:43%;width:43%;max-width:43%;height:88px;min-height:88px;border-radius:12px;}
+  .subject-item .item-copy{padding:8px 10px;}
+  .subject-item .item-name{font-size:12px;line-height:1.3;}
+  .subject-item .chev{right:10px;font-size:24px;}
+}
