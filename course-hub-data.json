@@ -1,7 +1,7 @@
 {
   "app": "Course Hub",
   "version": 9,
-  "exportedAt": "2026-10-09T09:44:23.413Z",
+  "exportedAt": "2026-10-11T17:47:37.595Z",
   "accounts": [
     {
       "id": "Sabik",
@@ -521,14 +521,14 @@
                   {
                     "id": "n_muznezfdemuwp9q",
                     "type": "chapter",
-                    "name": "২ - সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস",
+                    "name": "৩ - সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস",
                     "image": "",
                     "youtube": "",
                     "children": [
                       {
                         "id": "n_muznfbm0ujip2sb",
                         "type": "chapter-part",
-                        "name": "২.১ - সংখ্যা পদ্ধতি",
+                        "name": "৩.১ - সংখ্যা পদ্ধতি",
                         "image": "",
                         "youtube": "",
                         "children": [
@@ -585,7 +585,7 @@
                       {
                         "id": "n_muznfl0t444qv2a",
                         "type": "chapter-part",
-                        "name": "২.২ - ডিজিটাল ডিভাইস",
+                        "name": "৩.২ - ডিজিটাল ডিভাইস",
                         "image": "",
                         "youtube": "",
                         "children": [
