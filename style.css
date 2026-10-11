@@ -91,3 +91,29 @@ body{background:radial-gradient(ellipse at top,rgba(48,65,88,.12),transparent 55
   .course-thumb{width:42%;min-width:0;flex-basis:42%;height:auto;min-height:0;max-height:120px;border-radius:12px;}
   .subject-thumb{width:42%;max-width:42%;flex-basis:42%;height:auto;min-height:0;max-height:110px;border-radius:12px;}
 }
+
+/* GLOBAL THUMBNAIL CORNER FIX — public/main site */
+:root{--thumbnail-radius:14px}
+.tile-img,
+.content-card > img,
+.course-thumb,
+.subject-thumb,
+.hero-img,
+.hero-wide-img,
+.item-card img,
+.list img,
+.card-grid img,
+.course-list img,
+.subject-list img,
+[class*="thumb"] img,
+img.thumbnail,
+.thumbnail img{
+  border-radius:var(--thumbnail-radius) !important;
+  overflow:hidden;
+}
+/* Keep image corners visibly rounded without adding a dark frame or cropping the source. */
+.tile-img{border-radius:14px !important;}
+.content-card > img{border-radius:14px !important;}
+.course-thumb,.subject-thumb{object-fit:contain;background:transparent;}
+.hero-img,.hero-wide-img{border-radius:16px !important;}
+.item-card img,.list img,.card-grid img,.course-list img,.subject-list img{border-radius:12px !important;}
