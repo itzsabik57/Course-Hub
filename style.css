@@ -117,3 +117,27 @@ img.thumbnail,
 .course-thumb,.subject-thumb{object-fit:contain;background:transparent;}
 .hero-img,.hero-wide-img{border-radius:16px !important;}
 .item-card img,.list img,.card-grid img,.course-list img,.subject-list img{border-radius:12px !important;}
+
+/* FINAL FIX: round every actual image on the main site, regardless of its card/class name. */
+img {
+  border-radius: 14px !important;
+}
+
+/* Clip images at their own corners without adding a frame or cropping their content. */
+.course-thumb,
+.subject-thumb,
+.tile-img,
+.content-card > img,
+.item-card img,
+.list img,
+.card-grid img,
+.course-list img,
+.subject-list img,
+.hero-img,
+.hero-wide-img,
+[class*="thumb"] img,
+img.thumbnail,
+.thumbnail img {
+  border-radius: 14px !important;
+  overflow: hidden;
+}
