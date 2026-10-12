@@ -1,11 +1,11 @@
 {
   "app": "Course Hub",
   "version": 9,
-  "exportedAt": "2026-10-12T09:30:08.115Z",
+  "exportedAt": "2026-10-12T09:34:13.442Z",
   "accounts": [
     {
       "id": "Sabik",
-      "password": "admin",
+      "password": "sabik",
       "passwordHash": "",
       "enabled": true,
       "access": [
