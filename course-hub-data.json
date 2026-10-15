@@ -1,7 +1,7 @@
 {
   "app": "Course Hub",
   "version": 9,
-  "exportedAt": "2026-10-12T09:34:13.442Z",
+  "exportedAt": "2026-10-15T20:22:11.201Z",
   "accounts": [
     {
       "id": "Sabik",
@@ -625,6 +625,14 @@
                         ]
                       }
                     ]
+                  },
+                  {
+                    "id": "n_mv9zia5d7f14heq",
+                    "type": "lecture",
+                    "name": "All PDFs",
+                    "image": "",
+                    "youtube": "https://drive.google.com/drive/mobile/folders/1B-y7FYGYAP6shG13QeMmnop7tx4LlNX7/1YMQfkwsGaI0ljZjVnPkhon606ORvU3r_?fbclid=IwZXh0bgNhZW0CMTEAAR6eWPZZzETXCkRQSFYdGSo-xlGeNSA0JiqFkMHTO9HeyHzbw37n6knNrtc7_g_aem_N5tyl-0r4mNoZ_VYjQxmeQ&sort=13&direction=a",
+                    "children": []
                   }
                 ]
               }
